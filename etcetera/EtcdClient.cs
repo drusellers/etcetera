@@ -99,6 +99,16 @@
             });
             
         }
+
+        //TODO: dry this up
+        //TODO: add sorted to GET
+        //TODO: create directories
+        //TODO: listing directory
+        //TODO: deleting directory
+        //TODO: hidden nodes?
+        //TODO: add / expose directory TTL
+        //TODO: compare and swap
+        //TODO: stats
     }
 
     public class EtcdResponse
