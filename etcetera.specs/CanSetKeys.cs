@@ -32,5 +32,11 @@
         {
             _response.Node.Key.ShouldEqual("/dru");
         }
+
+        [Fact]
+        public void TtlIsNotSet()
+        {
+            _response.Node.Ttl.HasValue.ShouldBeFalse();
+        }
     }
 }

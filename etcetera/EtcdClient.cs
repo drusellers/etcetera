@@ -21,7 +21,17 @@
             _client = new RestClient(_root.ToString());
         }
 
-        //ttl overload
+        public EtcdResponse Set(string key, int ttl, object value)
+        {
+            var requestUrl = _keysRoot.AppendPath(key);
+            var putRequest = new RestRequest(requestUrl, Method.PUT);
+            putRequest.AddParameter("value", value);
+            putRequest.AddParameter("ttl", ttl);
+
+            var response = _client.Execute<EtcdResponse>(putRequest);
+            return response.Data;
+        }
+
         public EtcdResponse Set(string key, object value)
         {
             var requestUrl = _keysRoot.AppendPath(key);
@@ -81,6 +91,8 @@
         public string Key { get; set; }
         public int ModifiedIndex { get; set; }
         public string Value { get; set; }
+        public int? Ttl { get; set; }
+        public DateTime? Expiration { get; set; }
     }
     public static class UriHelpers
     {
