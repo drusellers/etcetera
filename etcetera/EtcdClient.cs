@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Threading.Tasks;
     using RestSharp;
 
     public class EtcdClient
@@ -60,7 +61,19 @@
             return response.Data;
         }
 
-        //watch is where i need to level myself up
+        public void Watch(string key, Action<EtcdResponse> followUp)
+        {
+            var requestUrl = _keysRoot.AppendPath(key);
+            var getRequest = new RestRequest(requestUrl, Method.GET);
+            getRequest.AddParameter("wait", true);
+
+            Task.Run(() =>
+            {
+                var response = _client.Execute<EtcdResponse>(getRequest);
+                followUp(response.Data);
+            });
+            
+        }
     }
 
     public class EtcdResponse
