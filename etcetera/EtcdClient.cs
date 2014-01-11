@@ -62,6 +62,17 @@
             return response.Data;
         }
 
+
+        public EtcdResponse Queue(string key, object value)
+        {
+            var requestUrl = _keysRoot.AppendPath(key);
+            var postRequest = new RestRequest(requestUrl, Method.POST);
+            postRequest.AddParameter("value", value);
+
+            var response = _client.Execute<EtcdResponse>(postRequest);
+            return response.Data;
+        }
+
         public EtcdResponse Delete(string key)
         {
             var requestUrl = _keysRoot.AppendPath(key);
