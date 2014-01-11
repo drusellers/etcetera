@@ -71,11 +71,15 @@
             return response.Data;
         }
 
-        public void Watch(string key, Action<EtcdResponse> followUp)
+        public void Watch(string key, Action<EtcdResponse> followUp, bool recursive = false)
         {
             var requestUrl = _keysRoot.AppendPath(key);
             var getRequest = new RestRequest(requestUrl, Method.GET);
             getRequest.AddParameter("wait", true);
+            if (recursive)
+            {
+                getRequest.AddParameter("recursive", recursive);
+            }
 
             Task.Run(() =>
             {

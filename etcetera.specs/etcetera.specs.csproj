@@ -45,9 +45,11 @@
   <ItemGroup>
     <Compile Include="CanDeleteKeys.cs" />
     <Compile Include="CanGetKeys.cs" />
+    <Compile Include="CanHandleExpiredKeys.cs" />
     <Compile Include="CanSetKeysWithTtl.cs" />
     <Compile Include="CanSetKeys.cs" />
     <Compile Include="CanWatchKeys.cs" />
+    <Compile Include="CanWatchKeysRecursively.cs" />
     <Compile Include="KeysWithSlashes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TrimUserSuppliedPath.cs" />
