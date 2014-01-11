@@ -22,6 +22,13 @@
             _client = new RestClient(_root.ToString());
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="ttl">Time to live in seconds</param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public EtcdResponse Set(string key, int ttl, object value)
         {
             var requestUrl = _keysRoot.AppendPath(key);
@@ -47,6 +54,9 @@
         {
             var requestUrl = _keysRoot.AppendPath(key);
             var getRequest = new RestRequest(requestUrl, Method.GET);
+
+            //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
+            getRequest.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
 
             var response = _client.Execute<EtcdResponse>(getRequest);
             return response.Data;
@@ -80,6 +90,12 @@
     {
         public string Action { get; set; }
         public Node Node { get; set; }
+
+        //ttl error
+        public int? ErrorCode { get; set; }
+        public string Cause { get; set; }
+        public int? Index { get; set; }
+        public string Message { get; set; }
     }
     public static class EtcResponseHelpers
     {
