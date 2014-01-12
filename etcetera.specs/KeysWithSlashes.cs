@@ -1,18 +1,16 @@
 ﻿namespace etcetera.specs
 {
-    using System;
     using Should;
     using Xunit;
 
-    public class KeysWithSlashes
+    public class KeysWithSlashes :
+        EtcdBase
     {
-        EtcdClient _etcdClient;
-        EtcdResponse _response;
+        readonly EtcdResponse _response;
 
         public KeysWithSlashes()
         {
-            _etcdClient = new EtcdClient(new Uri("http://192.168.101.1:4001/"));
-            _response = _etcdClient.Set("/folder1/bill", "wassup");
+            _response = Client.Set("/folder1/bill", "wassup");
         }
 
         [Fact]

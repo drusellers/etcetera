@@ -1,21 +1,17 @@
 ﻿namespace etcetera.specs
 {
-    using System;
     using Should;
     using Xunit;
 
-    public class CanDeleteDirs
+    public class CanDeleteDirs :
+        EtcdBase
     {
-        EtcdClient _etcdClient;
-        EtcdResponse _response;
-        Guid _key = Guid.NewGuid();
-        EtcdResponse _deleteResponse;
+        readonly EtcdResponse _deleteResponse;
 
         public CanDeleteDirs()
         {
-            _etcdClient = new EtcdClient(new Uri("http://192.168.101.1:4001/"));
-            _response = _etcdClient.CreateDir(_key.ToString());
-            _deleteResponse = _etcdClient.DeleteDir(_key.ToString());
+            Client.CreateDir(AKey);
+            _deleteResponse = Client.DeleteDir(AKey);
         }
 
         [Fact]
@@ -39,7 +35,7 @@
         [Fact]
         public void KeyIsSet()
         {
-            _deleteResponse.Node.Key.ShouldEqual("/" + _key);
+            _deleteResponse.Node.Key.ShouldEqual("/" + AKey);
         }
     }
 }

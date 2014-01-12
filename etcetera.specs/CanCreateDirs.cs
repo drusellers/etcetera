@@ -1,19 +1,16 @@
 ﻿namespace etcetera.specs
 {
-    using System;
     using Should;
     using Xunit;
 
-    public class CanCreateDirs
+    public class CanCreateDirs :
+        EtcdBase
     {
-        EtcdClient _etcdClient;
-        EtcdResponse _response;
-        Guid _key = Guid.NewGuid();
+        readonly EtcdResponse _response;
 
         public CanCreateDirs()
         {
-            _etcdClient = new EtcdClient(new Uri("http://192.168.101.1:4001/"));
-            _response = _etcdClient.CreateDir(_key.ToString());
+            _response = Client.CreateDir(AKey);
         }
 
         [Fact]
@@ -31,7 +28,7 @@
         [Fact]
         public void KeyIsSet()
         {
-            _response.Node.Key.ShouldEqual("/" + _key);
+            _response.Node.Key.ShouldEqual("/" + AKey);
         }
 
         [Fact]

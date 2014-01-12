@@ -56,6 +56,7 @@
     <Compile Include="CanSetKeys.cs" />
     <Compile Include="CanWatchKeys.cs" />
     <Compile Include="CanWatchKeysRecursively.cs" />
+    <Compile Include="EtcdBase.cs" />
     <Compile Include="KeysWithSlashes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TrimUserSuppliedPath.cs" />

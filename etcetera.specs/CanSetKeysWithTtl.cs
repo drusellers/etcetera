@@ -4,17 +4,16 @@
     using Should;
     using Xunit;
 
-    public class CanSetKeysWithTtl
+    public class CanSetKeysWithTtl :
+        EtcdBase
     {
-        EtcdClient _etcdClient;
-        EtcdResponse _response;
-        Guid _key = Guid.NewGuid();
-        int _ttl = 30;
-        DateTime _now;
+        readonly EtcdResponse _response;
+        readonly int _ttl = 30;
+        readonly DateTime _now;
+
         public CanSetKeysWithTtl()
         {
-            _etcdClient = new EtcdClient(new Uri("http://192.168.101.1:4001/"));
-            _response = _etcdClient.Set(_key.ToString(), "wassup", _ttl);
+            _response = Client.Set(AKey, "wassup", _ttl);
             _now = DateTime.Now;
         }
 
@@ -27,7 +26,7 @@
         [Fact]
         public void KeyIsSet()
         {
-            _response.Node.Key.ShouldEqual("/" + _key);
+            _response.Node.Key.ShouldEqual("/" + AKey);
         }
 
         [Fact]

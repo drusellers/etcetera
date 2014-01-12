@@ -1,23 +1,20 @@
 ﻿namespace etcetera.specs
 {
-    using System;
     using System.Linq;
     using Should;
     using Xunit;
 
-    public class CanReadQueueKeys
+    public class CanReadQueueKeys :
+        EtcdBase
     {
-        EtcdClient _etcdClient;
-        EtcdResponse _response;
-        Guid _id = Guid.NewGuid();
+        readonly EtcdResponse _response;
 
         public CanReadQueueKeys()
         {
-            _etcdClient = new EtcdClient(new Uri("http://192.168.101.1:4001/"));
-            _etcdClient.Queue(_id.ToString(), "wassup1");
-            _etcdClient.Queue(_id.ToString(), "wassup2");
+            Client.Queue(AKey, "wassup1");
+            Client.Queue(AKey, "wassup2");
 
-            _response = _etcdClient.Get(_id.ToString(), sorted:true);
+            _response = Client.Get(AKey, sorted:true);
         }
 
         [Fact]

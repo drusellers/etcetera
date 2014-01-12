@@ -1,21 +1,17 @@
 ﻿namespace etcetera.specs
 {
-    using System;
     using Should;
     using Xunit;
 
-    public class CanDeleteKeys
+    public class CanDeleteKeys :
+        EtcdBase
     {
-        EtcdClient _etcdClient;
-        EtcdResponse _response;
-        Guid _key = Guid.NewGuid();
-        EtcdResponse _deleteResponse;
+        readonly EtcdResponse _deleteResponse;
 
         public CanDeleteKeys()
         {
-            _etcdClient = new EtcdClient(new Uri("http://192.168.101.1:4001/"));
-            _response = _etcdClient.Set(_key.ToString(), "wassup");
-            _deleteResponse = _etcdClient.Delete(_key.ToString());
+            Client.Set(AKey, "wassup");
+            _deleteResponse = Client.Delete(AKey);
         }
 
         [Fact]
@@ -33,7 +29,7 @@
         [Fact]
         public void KeyIsSet()
         {
-            _deleteResponse.Node.Key.ShouldEqual("/" + _key);
+            _deleteResponse.Node.Key.ShouldEqual("/" + AKey);
         }
     }
 }

@@ -4,18 +4,15 @@
     using Should;
     using Xunit;
 
-    public class CanDeleteDirsWithStuff
+    public class CanDeleteDirsWithStuff :
+        EtcdBase
     {
-        EtcdClient _etcdClient;
-        EtcdResponse _response;
-        Guid _key = Guid.NewGuid();
         EtcdResponse _deleteResponse;
 
         public CanDeleteDirsWithStuff()
         {
-            _etcdClient = new EtcdClient(new Uri("http://192.168.101.1:4001/"));
-            _response = _etcdClient.Set(_key+"/bob", "hi");
-            _deleteResponse = _etcdClient.DeleteDir(_key.ToString(), true);
+            Client.Set(AKey +"/bob", "hi");
+            _deleteResponse = Client.DeleteDir(AKey, true);
         }
 
         [Fact]
@@ -39,7 +36,7 @@
         [Fact]
         public void KeyIsSet()
         {
-            _deleteResponse.Node.Key.ShouldEqual("/" + _key);
+            _deleteResponse.Node.Key.ShouldEqual("/" + AKey);
         }
     }
 }

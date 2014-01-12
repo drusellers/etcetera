@@ -1,21 +1,17 @@
 ﻿namespace etcetera.specs
 {
-    using System;
     using Should;
     using Xunit;
 
-    public class CanGetKeys
+    public class CanGetKeys :
+        EtcdBase
     {
-        EtcdClient _etcdClient;
-        EtcdResponse _response;
-        Guid _key = Guid.NewGuid();
-        EtcdResponse _getResponse;
+        readonly EtcdResponse _getResponse;
 
         public CanGetKeys()
         {
-            _etcdClient = new EtcdClient(new Uri("http://192.168.101.1:4001/"));
-            _response = _etcdClient.Set(_key.ToString(), "wassup");
-            _getResponse = _etcdClient.Get(_key.ToString());
+            Client.Set(AKey, "wassup");
+            _getResponse = Client.Get(AKey);
         }
 
         [Fact]
@@ -33,7 +29,7 @@
         [Fact]
         public void KeyIsSet()
         {
-            _getResponse.Node.Key.ShouldEqual("/" + _key);
+            _getResponse.Node.Key.ShouldEqual("/" + AKey);
         }
 
         [Fact]
