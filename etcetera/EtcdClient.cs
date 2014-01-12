@@ -25,13 +25,15 @@
         }
 
         /// <summary>
-        /// You can create hidden keys by prefixing with '_'
+        /// Sets the key to the provided value. 
+        /// etcd will automatically creates directories as needed
+        /// * You can create hidden keys by prefixing key with '_'
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="ttl">Time to live in seconds</param>
-        /// <param name="value"></param>
+        /// <param name="key">a hierarchical key</param>
+        /// <param name="ttl">time to live in seconds</param>
+        /// <param name="value">etcd only supports string values</param>
         /// <returns></returns>
-        public EtcdResponse Set(string key, object value, int ttl = 0)
+        public EtcdResponse Set(string key, string value, int ttl = 0)
         {
             return makeRequest(key, Method.PUT, req =>
             {
@@ -43,6 +45,12 @@
             });
         }
 
+        /// <summary>
+        /// Creates a dir
+        /// </summary>
+        /// <param name="key">the directory key</param>
+        /// <param name="ttl">time to live in seconds</param>
+        /// <returns></returns>
         public EtcdResponse CreateDir(string key, int ttl = 0)
         {
             return makeRequest(key, Method.PUT, req =>
@@ -55,6 +63,12 @@
             });
         }
 
+        /// <summary>
+        /// Get the value of the key
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="sorted">if getting a directory, this will return the keys sorted by index</param>
+        /// <returns></returns>
         public EtcdResponse Get(string key, bool sorted = false)
         {
             return makeRequest(key, Method.GET, req =>
@@ -69,6 +83,12 @@
             });
         }
 
+        /// <summary>
+        /// Will create a queued key
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="value">value</param>
+        /// <returns>note the key will be 'key/index' in the return object</returns>
         public EtcdResponse Queue(string key, object value)
         {
             return makeRequest(key, Method.POST, req =>
@@ -77,11 +97,23 @@
             });
         }
 
+
+        /// <summary>
+        /// deletes a key
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <returns></returns>
         public EtcdResponse Delete(string key)
         {
             return makeRequest(key, Method.DELETE);
         }
 
+        /// <summary>
+        /// deletes a directory, must pass recursive if you want to delete non-empty dirs
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="recursive">sholud this delete all 'sub keys'</param>
+        /// <returns></returns>
         public EtcdResponse DeleteDir(string key, bool recursive = false)
         {
             return makeRequest(key, Method.DELETE, req =>
@@ -91,6 +123,12 @@
             });
         }
 
+        /// <summary>
+        /// Sets up a watch on a keyspace and will call the callback when triggered
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="followUp">callback</param>
+        /// <param name="recursive">watch subkeys?</param>
         public void Watch(string key, Action<EtcdResponse> followUp, bool recursive = false)
         {
             var requestUrl = _keysRoot.AppendPath(key);
@@ -127,6 +165,7 @@
         //TODO: stats /v2/stats/leader
         //TODO: stats /v2/stats/self
         //TODO: stats /v2/stats/store
+        //TODO: test watch timing out?
     }
 
     public class EtcdResponse
