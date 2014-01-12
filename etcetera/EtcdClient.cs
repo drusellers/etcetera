@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Security;
     using System.Threading.Tasks;
     using RestSharp;
 
@@ -17,10 +16,10 @@
         {
             var uriBuilder = new UriBuilder(etcdLocation)
             {
-                Path = ""
+               Path = ""
             };
             _root = uriBuilder.Uri;
-            _keysRoot = new Uri(_root, "/v2/keys");
+            _keysRoot = _root.AppendPath("v2").AppendPath("keys");
             _client = new RestClient(_root.ToString());
         }
 
@@ -45,6 +44,14 @@
             return makeRequest(key, Method.PUT, req =>
             {
                 req.AddParameter("value", value);
+            });
+        }
+
+        public EtcdResponse CreateDir(string key)
+        {
+            return makeRequest(key, Method.PUT, req =>
+            {
+                req.AddParameter("dir", "true");
             });
         }
 
@@ -98,6 +105,7 @@
         {
             var requestUrl = _keysRoot.AppendPath(key);
             var request = new RestRequest(requestUrl, method);
+            
             
             if(action != null) action(request);
 
