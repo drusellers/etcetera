@@ -4,17 +4,17 @@
     using Should;
     using Xunit;
 
-    public class CanSetKeysWithTtl
+    public class CanSetDirsWithTtl
     {
         EtcdClient _etcdClient;
         EtcdResponse _response;
         Guid _key = Guid.NewGuid();
         int _ttl = 30;
         DateTime _now;
-        public CanSetKeysWithTtl()
+        public CanSetDirsWithTtl()
         {
             _etcdClient = new EtcdClient(new Uri("http://192.168.101.1:4001/"));
-            _response = _etcdClient.Set(_key.ToString(), "wassup", _ttl);
+            _response = _etcdClient.CreateDir(_key.ToString(), _ttl);
             _now = DateTime.Now;
         }
 
@@ -34,6 +34,12 @@
         public void TtlIsSet()
         {
             _response.Node.Ttl.ShouldEqual(_ttl);
+        }
+
+        [Fact]
+        public void IsDir()
+        {
+            _response.Node.Dir.ShouldBeTrue();
         }
 
         [Fact]

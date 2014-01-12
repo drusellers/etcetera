@@ -14,7 +14,7 @@
         public CanHandleExpiredKeys()
         {
             _etcdClient = new EtcdClient(new Uri("http://192.168.101.1:4001/"));
-            _etcdClient.Set(_key.ToString(), _ttl, "wassup");
+            _etcdClient.Set(_key.ToString(), "wassup", _ttl);
         }
 
         [Fact]

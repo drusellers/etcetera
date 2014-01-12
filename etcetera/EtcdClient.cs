@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using RestSharp;
 
@@ -30,28 +31,27 @@
         /// <param name="ttl">Time to live in seconds</param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public EtcdResponse Set(string key, int ttl, object value)
+        public EtcdResponse Set(string key, object value, int ttl = 0)
         {
             return makeRequest(key, Method.PUT, req =>
             {
                 req.AddParameter("value", value);
-                req.AddParameter("ttl", ttl);
+                if (ttl > 0)
+                {
+                    req.AddParameter("ttl", ttl);
+                }
             });
         }
 
-        public EtcdResponse Set(string key, object value)
-        {
-            return makeRequest(key, Method.PUT, req =>
-            {
-                req.AddParameter("value", value);
-            });
-        }
-
-        public EtcdResponse CreateDir(string key)
+        public EtcdResponse CreateDir(string key, int ttl = 0)
         {
             return makeRequest(key, Method.PUT, req =>
             {
                 req.AddParameter("dir", "true");
+                if (ttl > 0)
+                {
+                    req.AddParameter("ttl", ttl);
+                }
             });
         }
 
@@ -80,6 +80,15 @@
         public EtcdResponse Delete(string key)
         {
             return makeRequest(key, Method.DELETE);
+        }
+
+        public EtcdResponse DeleteDir(string key, bool recursive = false)
+        {
+            return makeRequest(key, Method.DELETE, req =>
+            {
+                req.AddParameter("dir", "true");
+                if (recursive) req.AddParameter("recursive", "true");
+            });
         }
 
         public void Watch(string key, Action<EtcdResponse> followUp, bool recursive = false)
@@ -114,11 +123,7 @@
         }
                            
 
-        //TODO: create directories
-        //TODO: listing directory
-        //TODO: deleting directory
         //TODO: hidden nodes?
-        //TODO: add / expose directory TTL
         //TODO: compare and swap
         //TODO: stats
     }
