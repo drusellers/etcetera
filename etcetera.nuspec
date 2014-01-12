@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>etcetera</id>
+    <version>0.4.0</version>
+    <authors>Dru Sellers</authors>
+    <owners>Dru Sellers</owners>
+    <licenseUrl>https://github.com/drusellers/etcetera/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/drusellers/etcetera</projectUrl>
+    <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A simple C# client for etcd</description>
+    <releaseNotes>The initial release</releaseNotes>
+    <copyright>Copyright 2014</copyright>
+    <tags>etcd</tags>
+    <language>en-US</language>
+    <dependencies>
+      <dependency id="RestSharp" version="104.4.0" />
+    </dependencies>
+  </metadata>
+</package>
