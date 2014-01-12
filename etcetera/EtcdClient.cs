@@ -1,7 +1,9 @@
 ﻿namespace etcetera
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
+    using System.Security;
     using System.Threading.Tasks;
     using RestSharp;
 
@@ -46,15 +48,19 @@
             });
         }
 
-        public EtcdResponse Get(string key)
+        public EtcdResponse Get(string key, bool sorted = false)
         {
             return makeRequest(key, Method.GET, req =>
             {
                 //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
                 req.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+
+                if (sorted)
+                {
+                    req.AddParameter("sorted", true);
+                }
             });
         }
-
 
         public EtcdResponse Queue(string key, object value)
         {
@@ -98,8 +104,8 @@
             var response = _client.Execute<EtcdResponse>(request);
             return response.Data;
         }
-        //TODO: dry this up
-        //TODO: add sorted to GET
+                           
+
         //TODO: create directories
         //TODO: listing directory
         //TODO: deleting directory
@@ -114,12 +120,14 @@
         public string Action { get; set; }
         public Node Node { get; set; }
 
+
         //ttl error
         public int? ErrorCode { get; set; }
         public string Cause { get; set; }
         public int? Index { get; set; }
         public string Message { get; set; }
     }
+
     public static class EtcResponseHelpers
     {
         public static int EtcIndex(this IRestResponse response)
@@ -137,6 +145,7 @@
             return (int)response.Headers.First(x => x.Name == "X-Raft-Term").Value;
         }
     }
+
     public class Node
     {
         public int CreatedIndex { get; set; }
@@ -145,7 +154,10 @@
         public string Value { get; set; }
         public int? Ttl { get; set; }
         public DateTime? Expiration { get; set; }
+        public List<Node> Nodes { get; set; }
+        public bool Dir { get; set; }
     }
+
     public static class UriHelpers
     {
         public static Uri AppendPath(this Uri uri, string path)

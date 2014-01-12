@@ -35,5 +35,11 @@
         {
             _getResponse.Node.Key.ShouldEqual("/" + _key);
         }
+
+        [Fact]
+        public void IsNotADir()
+        {
+            _getResponse.Node.Dir.ShouldBeFalse();
+        }
     }
 }
