@@ -31,55 +31,42 @@
         /// <returns></returns>
         public EtcdResponse Set(string key, int ttl, object value)
         {
-            var requestUrl = _keysRoot.AppendPath(key);
-            var putRequest = new RestRequest(requestUrl, Method.PUT);
-            putRequest.AddParameter("value", value);
-            putRequest.AddParameter("ttl", ttl);
-
-            var response = _client.Execute<EtcdResponse>(putRequest);
-            return response.Data;
+            return makeRequest(key, Method.PUT, req =>
+            {
+                req.AddParameter("value", value);
+                req.AddParameter("ttl", ttl);
+            });
         }
 
         public EtcdResponse Set(string key, object value)
         {
-            var requestUrl = _keysRoot.AppendPath(key);
-            var putRequest = new RestRequest(requestUrl, Method.PUT);
-            putRequest.AddParameter("value", value);
-
-            var response = _client.Execute<EtcdResponse>(putRequest);
-            return response.Data;
+            return makeRequest(key, Method.PUT, req =>
+            {
+                req.AddParameter("value", value);
+            });
         }
 
         public EtcdResponse Get(string key)
         {
-            var requestUrl = _keysRoot.AppendPath(key);
-            var getRequest = new RestRequest(requestUrl, Method.GET);
-
-            //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
-            getRequest.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
-
-            var response = _client.Execute<EtcdResponse>(getRequest);
-            return response.Data;
+            return makeRequest(key, Method.GET, req =>
+            {
+                //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
+                req.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            });
         }
 
 
         public EtcdResponse Queue(string key, object value)
         {
-            var requestUrl = _keysRoot.AppendPath(key);
-            var postRequest = new RestRequest(requestUrl, Method.POST);
-            postRequest.AddParameter("value", value);
-
-            var response = _client.Execute<EtcdResponse>(postRequest);
-            return response.Data;
+            return makeRequest(key, Method.POST, req =>
+            {
+                req.AddParameter("value", value);
+            });
         }
 
         public EtcdResponse Delete(string key)
         {
-            var requestUrl = _keysRoot.AppendPath(key);
-            var getRequest = new RestRequest(requestUrl, Method.DELETE);
-
-            var response = _client.Execute<EtcdResponse>(getRequest);
-            return response.Data;
+            return makeRequest(key, Method.DELETE);
         }
 
         public void Watch(string key, Action<EtcdResponse> followUp, bool recursive = false)
@@ -92,6 +79,7 @@
                 getRequest.AddParameter("recursive", recursive);
             }
 
+            //TODO: Code review this. I know its not a good way to do this
             Task.Run(() =>
             {
                 var response = _client.Execute<EtcdResponse>(getRequest);
@@ -100,6 +88,16 @@
             
         }
 
+        EtcdResponse makeRequest(string key, Method method, Action<IRestRequest> action = null)
+        {
+            var requestUrl = _keysRoot.AppendPath(key);
+            var request = new RestRequest(requestUrl, method);
+            
+            if(action != null) action(request);
+
+            var response = _client.Execute<EtcdResponse>(request);
+            return response.Data;
+        }
         //TODO: dry this up
         //TODO: add sorted to GET
         //TODO: create directories
