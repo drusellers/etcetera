@@ -123,8 +123,10 @@
         }
                            
 
-        //TODO: compare and swap
-        //TODO: stats
+        //TODO: compare and swap options
+        //TODO: stats /v2/stats/leader
+        //TODO: stats /v2/stats/self
+        //TODO: stats /v2/stats/store
     }
 
     public class EtcdResponse
