@@ -25,7 +25,7 @@
         }
 
         /// <summary>
-        /// 
+        /// You can create hidden keys by prefixing with '_'
         /// </summary>
         /// <param name="key"></param>
         /// <param name="ttl">Time to live in seconds</param>
@@ -123,7 +123,6 @@
         }
                            
 
-        //TODO: hidden nodes?
         //TODO: compare and swap
         //TODO: stats
     }
