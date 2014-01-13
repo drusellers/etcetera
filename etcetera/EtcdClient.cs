@@ -139,13 +139,8 @@
                 getRequest.AddParameter("recursive", recursive);
             }
 
-            //TODO: Code review this. I know its not a good way to do this
-            Task.Run(() =>
-            {
-                var response = _client.Execute<EtcdResponse>(getRequest);
-                followUp(response.Data);
-            });
-            
+            _client.ExecuteTaskAsync<EtcdResponse>(getRequest)
+                .ContinueWith(t => followUp(t.Result.Data));
         }
 
         EtcdResponse makeRequest(string key, Method method, Action<IRestRequest> action = null)
