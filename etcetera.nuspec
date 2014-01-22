@@ -7,7 +7,6 @@
     <owners>Dru Sellers</owners>
     <licenseUrl>https://github.com/drusellers/etcetera/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/drusellers/etcetera</projectUrl>
-    <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A simple C# client for etcd</description>
     <releaseNotes>The initial release</releaseNotes>
