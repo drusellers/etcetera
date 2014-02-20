@@ -7,9 +7,9 @@
         public string AKey = Guid.NewGuid().ToString();
         public EtcdClient Client { get; set; }
 
-        public EtcdBase()
+        protected EtcdBase()
         {
-            Client = new EtcdClient(new Uri("http://192.168.101.1:4001/"));
+            Client = new EtcdClient(new Uri("http://172.16.73.1:4001/"));
         }
     }
 }

@@ -43,6 +43,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CanCompareAndSwapValues.cs" />
     <Compile Include="CanCreateDirs.cs" />
     <Compile Include="CanDeleteDirs.cs" />
     <Compile Include="CanDeleteDirsWithStuff.cs" />

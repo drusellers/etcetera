@@ -32,15 +32,32 @@
         /// <param name="key">a hierarchical key</param>
         /// <param name="ttl">time to live in seconds</param>
         /// <param name="value">etcd only supports string values</param>
+        /// <param name="prevExist">Used to compare and swap on existance</param>
+        /// <param name="prevValue">Used to compare and swap on value</param>
+        /// <param name="prevIndex">Used to compare and swap on index</param>
         /// <returns></returns>
-        public EtcdResponse Set(string key, string value, int ttl = 0)
+        public EtcdResponse Set(string key, string value, int ttl = 0, bool? prevExist = null, string prevValue=null, int? prevIndex=null)
         {
             return makeRequest(key, Method.PUT, req =>
             {
+                //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
+                req.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
                 req.AddParameter("value", value);
                 if (ttl > 0)
                 {
                     req.AddParameter("ttl", ttl);
+                }
+                if (prevExist.HasValue)
+                {
+                    req.AddParameter("prevExist", prevExist.Value.ToString().ToLower());
+                }
+                if (prevValue != null)
+                {
+                    req.AddParameter("prevValue", prevValue);
+                }
+                if (prevIndex.HasValue)
+                {
+                    req.AddParameter("prevIndex", prevIndex.Value);
                 }
             });
         }
@@ -174,6 +191,7 @@
         public string Cause { get; set; }
         public int? Index { get; set; }
         public string Message { get; set; }
+        public Node PrevNode { get; set; }
     }
 
     public static class EtcResponseHelpers
