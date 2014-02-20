@@ -1,10 +1,10 @@
-﻿namespace etcetera
+﻿using System.Net;
+
+namespace etcetera
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
     using RestSharp;
 
     public class EtcdClient
@@ -12,6 +12,7 @@
         readonly IRestClient _client;
         readonly Uri _root;
         readonly Uri _keysRoot;
+        readonly Uri _lockRoot;
 
         public EtcdClient(Uri etcdLocation)
         {
@@ -21,6 +22,7 @@
             };
             _root = uriBuilder.Uri;
             _keysRoot = _root.AppendPath("v2").AppendPath("keys");
+            _lockRoot = _root.AppendPath("mod").AppendPath("v2").AppendPath("lock");
             _client = new RestClient(_root.ToString());
         }
 
@@ -38,7 +40,7 @@
         /// <returns></returns>
         public EtcdResponse Set(string key, string value, int ttl = 0, bool? prevExist = null, string prevValue=null, int? prevIndex=null)
         {
-            return makeRequest(key, Method.PUT, req =>
+            return makeKeyRequest(key, Method.PUT, req =>
             {
                 //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
                 req.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
@@ -70,7 +72,7 @@
         /// <returns></returns>
         public EtcdResponse CreateDir(string key, int ttl = 0)
         {
-            return makeRequest(key, Method.PUT, req =>
+            return makeKeyRequest(key, Method.PUT, req =>
             {
                 req.AddParameter("dir", "true");
                 if (ttl > 0)
@@ -88,7 +90,7 @@
         /// <returns></returns>
         public EtcdResponse Get(string key, bool sorted = false)
         {
-            return makeRequest(key, Method.GET, req =>
+            return makeKeyRequest(key, Method.GET, req =>
             {
                 //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
                 req.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
@@ -108,7 +110,7 @@
         /// <returns>note the key will be 'key/index' in the return object</returns>
         public EtcdResponse Queue(string key, object value)
         {
-            return makeRequest(key, Method.POST, req =>
+            return makeKeyRequest(key, Method.POST, req =>
             {
                 req.AddParameter("value", value);
             });
@@ -124,7 +126,7 @@
         /// <returns></returns>
         public EtcdResponse Delete(string key, string prevValue = null, int? prevIndex = null)
         {
-            return makeRequest(key, Method.DELETE, req =>
+            return makeKeyRequest(key, Method.DELETE, req =>
             {
                 //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
                 req.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
@@ -148,7 +150,7 @@
         /// <returns></returns>
         public EtcdResponse DeleteDir(string key, bool recursive = false)
         {
-            return makeRequest(key, Method.DELETE, req =>
+            return makeKeyRequest(key, Method.DELETE, req =>
             {
                 req.AddParameter("dir", "true");
                 if (recursive) req.AddParameter("recursive", "true");
@@ -175,7 +177,7 @@
                 .ContinueWith(t => followUp(t.Result.Data));
         }
 
-        EtcdResponse makeRequest(string key, Method method, Action<IRestRequest> action = null)
+        EtcdResponse makeKeyRequest(string key, Method method, Action<IRestRequest> action = null)
         {
             var requestUrl = _keysRoot.AppendPath(key);
             var request = new RestRequest(requestUrl, method);
@@ -186,13 +188,49 @@
             var response = _client.Execute<EtcdResponse>(request);
             return response.Data;
         }
-                           
 
-        //TODO: compare and swap options
+
+        /// <summary>
+        /// Access the lock module of Etcd
+        /// </summary>
+        /// <param name="key">The key to acquire the lock on</param>
+        /// <param name="ttl">The time to live in seconds of the lock</param>
+        /// <param name="index">You can renew a lock by providing the previous index</param>
+        /// <returns></returns>
+        public string Lock(string key, int ttl, int? index = null)
+        {
+            var requestUrl = _lockRoot.AppendPath(key);
+            var method = index.HasValue ? Method.PUT : Method.POST;
+            var request = new RestRequest(requestUrl, method);
+            request.AddParameter("ttl", ttl);
+
+            if (index.HasValue)
+            {
+                request.AddParameter("index", index.Value);
+            }
+
+            var response = _client.Execute(request);
+            
+            return response.Content;
+        }
+
+        public string ReleaseLock(string key, int index)
+        {
+            var requestUrl = _lockRoot.AppendPath(key);
+            var request = new RestRequest(requestUrl, Method.DELETE);
+            request.AddParameter("index", index);
+
+
+            var response = _client.Execute(request);
+
+            return response.Content;
+        }
+
         //TODO: stats /v2/stats/leader
         //TODO: stats /v2/stats/self
         //TODO: stats /v2/stats/store
         //TODO: test watch timing out?
+
     }
 
     public class EtcdResponse
