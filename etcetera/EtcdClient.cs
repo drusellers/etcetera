@@ -119,10 +119,25 @@
         /// deletes a key
         /// </summary>
         /// <param name="key">key</param>
+        /// <param name="prevValue">Compare and Delete on prevValue</param>
+        /// <param name="prevIndex">Compare and Delete on prevIndex</param>
         /// <returns></returns>
-        public EtcdResponse Delete(string key)
+        public EtcdResponse Delete(string key, string prevValue = null, int? prevIndex = null)
         {
-            return makeRequest(key, Method.DELETE);
+            return makeRequest(key, Method.DELETE, req =>
+            {
+                //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
+                req.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+
+                if (prevValue != null)
+                {
+                    req.AddParameter("prevValue", prevValue);
+                }
+                if (prevIndex.HasValue)
+                {
+                    req.AddParameter("prevIndex", prevIndex.Value);
+                }
+            });
         }
 
         /// <summary>
