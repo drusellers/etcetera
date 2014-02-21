@@ -33,5 +33,5 @@ task :nuget do
 end
 
 task :release do
-  sh '.nuget/nuget.exe push build/etcetera.0.4.0.nupkg'
+  sh '.nuget/nuget.exe push build/etcetera.0.5.0.nupkg'
 end
