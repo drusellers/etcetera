@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Threading;
 
 namespace etcetera
 {
@@ -163,14 +164,21 @@ namespace etcetera
         /// <param name="key">key</param>
         /// <param name="followUp">callback</param>
         /// <param name="recursive">watch subkeys?</param>
-        public void Watch(string key, Action<EtcdResponse> followUp, bool recursive = false)
+        /// <param name="timeout">How long will we watch?</param>
+        public void Watch(string key, Action<EtcdResponse> followUp, bool recursive = false, int? timeout = null)
         {
             var requestUrl = _keysRoot.AppendPath(key);
             var getRequest = new RestRequest(requestUrl, Method.GET);
             getRequest.AddParameter("wait", true);
+            
             if (recursive)
             {
                 getRequest.AddParameter("recursive", recursive);
+            }
+
+            if (timeout.HasValue)
+            {
+                getRequest.Timeout = timeout.Value;
             }
 
             _client.ExecuteTaskAsync<EtcdResponse>(getRequest)
@@ -199,38 +207,38 @@ namespace etcetera
         /// <returns></returns>
         public string Lock(string key, int ttl, int? index = null)
         {
-            var requestUrl = _lockRoot.AppendPath(key);
             var method = index.HasValue ? Method.PUT : Method.POST;
-            var request = new RestRequest(requestUrl, method);
-            request.AddParameter("ttl", ttl);
-
-            if (index.HasValue)
+            return makeLockRequest(key, method, req =>
             {
-                request.AddParameter("index", index.Value);
-            }
+                req.AddParameter("ttl", ttl);
 
-            var response = _client.Execute(request);
-            
-            return response.Content;
+                if (index.HasValue)
+                {
+                    req.AddParameter("index", index.Value);
+                }
+            });
         }
 
         public string ReleaseLock(string key, int index)
         {
-            var requestUrl = _lockRoot.AppendPath(key);
-            var request = new RestRequest(requestUrl, Method.DELETE);
-            request.AddParameter("index", index);
+            return makeLockRequest(key, Method.DELETE, req =>
+            {
+                req.AddParameter("index", index);
+            });
+        }
 
+        string makeLockRequest(string key, Method method, Action<IRestRequest> action)
+        {
+            var requestUrl = _lockRoot.AppendPath(key);
+            var request = new RestRequest(requestUrl, method);
 
             var response = _client.Execute(request);
-
             return response.Content;
         }
 
         //TODO: stats /v2/stats/leader
         //TODO: stats /v2/stats/self
         //TODO: stats /v2/stats/store
-        //TODO: test watch timing out?
-
     }
 
     public class EtcdResponse
