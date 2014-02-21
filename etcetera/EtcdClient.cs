@@ -169,7 +169,7 @@ namespace etcetera
         {
             var requestUrl = _keysRoot.AppendPath(key);
             var getRequest = new RestRequest(requestUrl, Method.GET);
-            getRequest.AddParameter("wait", true);
+            getRequest.AddParameter("wait", "true");
             
             if (recursive)
             {
@@ -231,6 +231,8 @@ namespace etcetera
         {
             var requestUrl = _lockRoot.AppendPath(key);
             var request = new RestRequest(requestUrl, method);
+
+            action(request);
 
             var response = _client.Execute(request);
             return response.Content;
