@@ -236,9 +236,38 @@ namespace etcetera
             return response.Content;
         }
 
+        public EtcdStoreResponse StoreStats()
+        {
+            var requestUrl = _root.AppendPath("v2").AppendPath("stats").AppendPath("store");
+            var request = new RestRequest(requestUrl, Method.GET);
+            
+            //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
+            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+
+            var response = _client.Execute<EtcdStoreResponse>(request);
+            return response.Data;
+        }
+
         //TODO: stats /v2/stats/leader
         //TODO: stats /v2/stats/self
-        //TODO: stats /v2/stats/store
+    }
+
+    public class EtcdStoreResponse
+    {
+        public int CompareAndSwapFail { get; set; }
+        public int CompareAndSwapSuccess { get; set; }
+        public int CreateFail { get; set; }
+        public int CreateSuccess { get; set; }
+        public int DeleteFail { get; set; }
+        public int DeleteSuccess { get; set; }
+        public int ExpireCount { get; set; }
+        public int GetsFail { get; set; }
+        public int GetsSuccess { get; set; }
+        public int SetsFail { get; set; }
+        public int SetsSuccess { get; set; }
+        public int UpdateFail { get; set; }
+        public int UpdateSuccess { get; set; }
+        public int Watchers { get; set; }
     }
 
     public class EtcdResponse
