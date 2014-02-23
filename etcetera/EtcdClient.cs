@@ -191,5 +191,7 @@
 
         public IEtcdStatisticsModule Statistics { get; private set; }
         public IEtcdLockModule Lock { get; private set; }
+
+        //TODO: Leadership module
     }
 }
