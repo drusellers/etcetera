@@ -50,6 +50,8 @@
     <Compile Include="CanDeleteDirs.cs" />
     <Compile Include="CanDeleteDirsWithStuff.cs" />
     <Compile Include="CanDeleteKeys.cs" />
+    <Compile Include="CanGetKeysSorted.cs" />
+    <Compile Include="CanGetKeysRecursively.cs" />
     <Compile Include="CanGetKeys.cs" />
     <Compile Include="CanGetStoreStats.cs" />
     <Compile Include="CanHandleExpiredKeys.cs" />

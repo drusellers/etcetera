@@ -5,11 +5,13 @@
     public abstract class EtcdBase
     {
         public string AKey = Guid.NewGuid().ToString();
+        public string ADirectory = Guid.NewGuid().ToString();
+
         public EtcdClient Client { get; set; }
 
         protected EtcdBase()
         {
-            Client = new EtcdClient(new Uri("http://172.16.73.1:4001/"));
+            Client = new EtcdClient(new Uri("http://192.168.101.1:4001/"));
         }
     }
 }
