@@ -8,7 +8,7 @@ namespace etcetera.specs
         [Fact]
         public void CanSeeStats()
         {
-            var resp = Client.StoreStats();
+            var resp = Client.Statistics.Store();
             resp.ShouldNotBeNull();
         }
     }

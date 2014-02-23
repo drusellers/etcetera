@@ -1,36 +1,35 @@
-﻿using System.Net;
-using System.Threading;
-
-namespace etcetera
+﻿namespace etcetera
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using RestSharp;
 
-    public class EtcdClient
+    public class EtcdClient : IEtcdClient
     {
         readonly IRestClient _client;
-        readonly Uri _root;
         readonly Uri _keysRoot;
         readonly Uri _lockRoot;
+        readonly Uri _root;
 
         public EtcdClient(Uri etcdLocation)
         {
             var uriBuilder = new UriBuilder(etcdLocation)
             {
-               Path = ""
+                Path = ""
             };
             _root = uriBuilder.Uri;
             _keysRoot = _root.AppendPath("v2").AppendPath("keys");
             _lockRoot = _root.AppendPath("mod").AppendPath("v2").AppendPath("lock");
             _client = new RestClient(_root.ToString());
+
+            Statistics = new StatisticsModule(_root, _client);
         }
 
         /// <summary>
-        /// Sets the key to the provided value. 
-        /// etcd will automatically creates directories as needed
-        /// * You can create hidden keys by prefixing key with '_'
+        ///     Sets the key to the provided value.
+        ///     etcd will automatically creates directories as needed
+        ///     * You can create hidden keys by prefixing key with '_'
         /// </summary>
         /// <param name="key">a hierarchical key</param>
         /// <param name="ttl">time to live in seconds</param>
@@ -39,7 +38,8 @@ namespace etcetera
         /// <param name="prevValue">Used to compare and swap on value</param>
         /// <param name="prevIndex">Used to compare and swap on index</param>
         /// <returns></returns>
-        public EtcdResponse Set(string key, string value, int ttl = 0, bool? prevExist = null, string prevValue=null, int? prevIndex=null)
+        public EtcdResponse Set(string key, string value, int ttl = 0, bool? prevExist = null, string prevValue = null,
+            int? prevIndex = null)
         {
             return makeKeyRequest(key, Method.PUT, req =>
             {
@@ -66,7 +66,7 @@ namespace etcetera
         }
 
         /// <summary>
-        /// Creates a dir
+        ///     Creates a dir
         /// </summary>
         /// <param name="key">the directory key</param>
         /// <param name="ttl">time to live in seconds</param>
@@ -84,7 +84,7 @@ namespace etcetera
         }
 
         /// <summary>
-        /// Get the value of the key
+        ///     Get the value of the key
         /// </summary>
         /// <param name="key">key</param>
         /// <param name="recursive">get recursively all the contents under a directory</param>
@@ -103,22 +103,19 @@ namespace etcetera
         }
 
         /// <summary>
-        /// Will create a queued key
+        ///     Will create a queued key
         /// </summary>
         /// <param name="key">key</param>
         /// <param name="value">value</param>
         /// <returns>note the key will be 'key/index' in the return object</returns>
         public EtcdResponse Queue(string key, object value)
         {
-            return makeKeyRequest(key, Method.POST, req =>
-            {
-                req.AddParameter("value", value);
-            });
+            return makeKeyRequest(key, Method.POST, req => { req.AddParameter("value", value); });
         }
 
 
         /// <summary>
-        /// deletes a key
+        ///     deletes a key
         /// </summary>
         /// <param name="key">key</param>
         /// <param name="prevValue">Compare and Delete on prevValue</param>
@@ -143,7 +140,7 @@ namespace etcetera
         }
 
         /// <summary>
-        /// deletes a directory, must pass recursive if you want to delete non-empty dirs
+        ///     deletes a directory, must pass recursive if you want to delete non-empty dirs
         /// </summary>
         /// <param name="key">key</param>
         /// <param name="recursive">sholud this delete all 'sub keys'</param>
@@ -158,7 +155,7 @@ namespace etcetera
         }
 
         /// <summary>
-        /// Sets up a watch on a keyspace and will call the callback when triggered
+        ///     Sets up a watch on a keyspace and will call the callback when triggered
         /// </summary>
         /// <param name="key">key</param>
         /// <param name="followUp">callback</param>
@@ -169,7 +166,7 @@ namespace etcetera
             var requestUrl = _keysRoot.AppendPath(key);
             var getRequest = new RestRequest(requestUrl, Method.GET);
             getRequest.AddParameter("wait", "true");
-            
+
             if (recursive)
             {
                 getRequest.AddParameter("recursive", recursive);
@@ -181,16 +178,16 @@ namespace etcetera
             }
 
             _client.ExecuteTaskAsync<EtcdResponse>(getRequest)
-                .ContinueWith(t => followUp(t.Result.Data));
+                   .ContinueWith(t => followUp(t.Result.Data));
         }
 
         EtcdResponse makeKeyRequest(string key, Method method, Action<IRestRequest> action = null)
         {
             var requestUrl = _keysRoot.AppendPath(key);
             var request = new RestRequest(requestUrl, method);
-            
-            
-            if(action != null) action(request);
+
+
+            if (action != null) action(request);
 
             var response = _client.Execute<EtcdResponse>(request);
             return response.Data;
@@ -198,7 +195,7 @@ namespace etcetera
 
 
         /// <summary>
-        /// Access the lock module of Etcd
+        ///     Access the lock module of Etcd
         /// </summary>
         /// <param name="key">The key to acquire the lock on</param>
         /// <param name="ttl">The time to live in seconds of the lock</param>
@@ -220,10 +217,7 @@ namespace etcetera
 
         public string ReleaseLock(string key, int index)
         {
-            return makeLockRequest(key, Method.DELETE, req =>
-            {
-                req.AddParameter("index", index);
-            });
+            return makeLockRequest(key, Method.DELETE, req => { req.AddParameter("index", index); });
         }
 
         string makeLockRequest(string key, Method method, Action<IRestRequest> action)
@@ -237,19 +231,8 @@ namespace etcetera
             return response.Content;
         }
 
-        public EtcdStoreResponse StoreStats()
-        {
-            var requestUrl = _root.AppendPath("v2").AppendPath("stats").AppendPath("store");
-            var request = new RestRequest(requestUrl, Method.GET);
-            
-            //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+        public IEtcdStatisticsModule Statistics { get; private set; }
 
-            var response = _client.Execute<EtcdStoreResponse>(request);
-            return response.Data;
-        }
-
-        //TODO: stats /v2/stats/leader
         //TODO: stats /v2/stats/self
     }
 
@@ -289,17 +272,17 @@ namespace etcetera
     {
         public static int EtcIndex(this IRestResponse response)
         {
-            return (int)response.Headers.First(x=>x.Name == "X-Etcd-Index").Value;
+            return (int) response.Headers.First(x => x.Name == "X-Etcd-Index").Value;
         }
 
         public static int EtcRaftIndex(this IRestResponse response)
         {
-            return (int)response.Headers.First(x=>x.Name == "X-Raft-Index").Value;
+            return (int) response.Headers.First(x => x.Name == "X-Raft-Index").Value;
         }
 
         public static int EtcRaftTerm(this IRestResponse response)
         {
-            return (int)response.Headers.First(x => x.Name == "X-Raft-Term").Value;
+            return (int) response.Headers.First(x => x.Name == "X-Raft-Term").Value;
         }
     }
 
@@ -319,7 +302,7 @@ namespace etcetera
     {
         public static Uri AppendPath(this Uri uri, string path)
         {
-            var path1 = uri.AbsolutePath.TrimEnd(new []
+            var path1 = uri.AbsolutePath.TrimEnd(new[]
             {
                 '/'
             }) + "/" + path;

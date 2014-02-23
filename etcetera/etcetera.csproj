@@ -41,7 +41,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EtcdClient.cs" />
+    <Compile Include="EtcdLeaderStatsResponse.cs" />
+    <Compile Include="IEtcdClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StatisticsModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
