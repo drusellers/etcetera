@@ -1,8 +1,6 @@
 ﻿namespace etcetera
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using RestSharp;
 
     public class EtcdClient : IEtcdClient
@@ -10,7 +8,6 @@
         readonly IRestClient _client;
         readonly Uri _keysRoot;
         readonly Uri _lockRoot;
-        readonly Uri _root;
 
         public EtcdClient(Uri etcdLocation)
         {
@@ -18,12 +15,12 @@
             {
                 Path = ""
             };
-            _root = uriBuilder.Uri;
-            _keysRoot = _root.AppendPath("v2").AppendPath("keys");
-            _lockRoot = _root.AppendPath("mod").AppendPath("v2").AppendPath("lock");
-            _client = new RestClient(_root.ToString());
+            var root = uriBuilder.Uri;
+            _keysRoot = root.AppendPath("v2").AppendPath("keys");
+            _lockRoot = root.AppendPath("mod").AppendPath("v2").AppendPath("lock");
+            _client = new RestClient(root.ToString());
 
-            Statistics = new StatisticsModule(_root, _client);
+            Statistics = new StatisticsModule(root, _client);
         }
 
         /// <summary>
@@ -234,79 +231,5 @@
         public IEtcdStatisticsModule Statistics { get; private set; }
 
         //TODO: stats /v2/stats/self
-    }
-
-    public class EtcdStoreResponse
-    {
-        public int CompareAndSwapFail { get; set; }
-        public int CompareAndSwapSuccess { get; set; }
-        public int CreateFail { get; set; }
-        public int CreateSuccess { get; set; }
-        public int DeleteFail { get; set; }
-        public int DeleteSuccess { get; set; }
-        public int ExpireCount { get; set; }
-        public int GetsFail { get; set; }
-        public int GetsSuccess { get; set; }
-        public int SetsFail { get; set; }
-        public int SetsSuccess { get; set; }
-        public int UpdateFail { get; set; }
-        public int UpdateSuccess { get; set; }
-        public int Watchers { get; set; }
-    }
-
-    public class EtcdResponse
-    {
-        public string Action { get; set; }
-        public Node Node { get; set; }
-
-
-        //ttl error
-        public int? ErrorCode { get; set; }
-        public string Cause { get; set; }
-        public int? Index { get; set; }
-        public string Message { get; set; }
-        public Node PrevNode { get; set; }
-    }
-
-    public static class EtcResponseHelpers
-    {
-        public static int EtcIndex(this IRestResponse response)
-        {
-            return (int) response.Headers.First(x => x.Name == "X-Etcd-Index").Value;
-        }
-
-        public static int EtcRaftIndex(this IRestResponse response)
-        {
-            return (int) response.Headers.First(x => x.Name == "X-Raft-Index").Value;
-        }
-
-        public static int EtcRaftTerm(this IRestResponse response)
-        {
-            return (int) response.Headers.First(x => x.Name == "X-Raft-Term").Value;
-        }
-    }
-
-    public class Node
-    {
-        public int CreatedIndex { get; set; }
-        public string Key { get; set; }
-        public int ModifiedIndex { get; set; }
-        public string Value { get; set; }
-        public int? Ttl { get; set; }
-        public DateTime? Expiration { get; set; }
-        public List<Node> Nodes { get; set; }
-        public bool Dir { get; set; }
-    }
-
-    public static class UriHelpers
-    {
-        public static Uri AppendPath(this Uri uri, string path)
-        {
-            var path1 = uri.AbsolutePath.TrimEnd(new[]
-            {
-                '/'
-            }) + "/" + path;
-            return new UriBuilder(uri.Scheme, uri.Host, uri.Port, path1, uri.Query).Uri;
-        }
     }
 }
