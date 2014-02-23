@@ -35,8 +35,9 @@
         /// <param name="key">key</param>
         /// <param name="recursive">get recursively all the contents under a directory</param>
         /// <param name="sorted">if getting a directory, this will return the keys sorted by index</param>
+        /// <param name="consistent">if you need the most up-to-date value, set this to true</param>
         /// <returns></returns>
-        EtcdResponse Get(string key, bool recursive = false, bool sorted = false);
+        EtcdResponse Get(string key, bool recursive = false, bool sorted = false, bool consistent = false);
 
         /// <summary>
         ///     Will create a queued key
