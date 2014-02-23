@@ -87,14 +87,20 @@ namespace etcetera
         /// Get the value of the key
         /// </summary>
         /// <param name="key">key</param>
+        /// <param name="recursive">get recursively all the contents under a directory</param>
         /// <param name="sorted">if getting a directory, this will return the keys sorted by index</param>
         /// <returns></returns>
-        public EtcdResponse Get(string key, bool sorted = false)
+        public EtcdResponse Get(string key, bool recursive = false, bool sorted = false)
         {
             return makeKeyRequest(key, Method.GET, req =>
             {
                 //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
                 req.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+
+                if (recursive)
+                {
+                    req.AddParameter("recursive", true);
+                }
 
                 if (sorted)
                 {
