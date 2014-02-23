@@ -7,7 +7,6 @@
     {
         readonly IRestClient _client;
         readonly Uri _keysRoot;
-        readonly Uri _lockRoot;
 
         public EtcdClient(Uri etcdLocation)
         {
@@ -17,10 +16,10 @@
             };
             var root = uriBuilder.Uri;
             _keysRoot = root.AppendPath("v2").AppendPath("keys");
-            _lockRoot = root.AppendPath("mod").AppendPath("v2").AppendPath("lock");
             _client = new RestClient(root.ToString());
 
             Statistics = new StatisticsModule(root, _client);
+            Lock = new EtcdLockModule(root, _client);
         }
 
         /// <summary>
@@ -190,46 +189,7 @@
             return response.Data;
         }
 
-
-        /// <summary>
-        ///     Access the lock module of Etcd
-        /// </summary>
-        /// <param name="key">The key to acquire the lock on</param>
-        /// <param name="ttl">The time to live in seconds of the lock</param>
-        /// <param name="index">You can renew a lock by providing the previous index</param>
-        /// <returns></returns>
-        public string Lock(string key, int ttl, int? index = null)
-        {
-            var method = index.HasValue ? Method.PUT : Method.POST;
-            return makeLockRequest(key, method, req =>
-            {
-                req.AddParameter("ttl", ttl);
-
-                if (index.HasValue)
-                {
-                    req.AddParameter("index", index.Value);
-                }
-            });
-        }
-
-        public string ReleaseLock(string key, int index)
-        {
-            return makeLockRequest(key, Method.DELETE, req => { req.AddParameter("index", index); });
-        }
-
-        string makeLockRequest(string key, Method method, Action<IRestRequest> action)
-        {
-            var requestUrl = _lockRoot.AppendPath(key);
-            var request = new RestRequest(requestUrl, method);
-
-            action(request);
-
-            var response = _client.Execute(request);
-            return response.Content;
-        }
-
         public IEtcdStatisticsModule Statistics { get; private set; }
-
-        //TODO: stats /v2/stats/self
+        public IEtcdLockModule Lock { get; private set; }
     }
 }
