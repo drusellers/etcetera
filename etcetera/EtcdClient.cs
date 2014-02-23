@@ -97,15 +97,8 @@ namespace etcetera
                 //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
                 req.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
 
-                if (recursive)
-                {
-                    req.AddParameter("recursive", true);
-                }
-
-                if (sorted)
-                {
-                    req.AddParameter("sorted", true);
-                }
+                req.AddParameter("recursive", recursive.ToString().ToLower());
+                req.AddParameter("sorted", sorted.ToString().ToLower());
             });
         }
 
