@@ -159,7 +159,8 @@
         /// <param name="followUp">callback</param>
         /// <param name="recursive">watch subkeys?</param>
         /// <param name="timeout">How long will we watch?</param>
-        public void Watch(string key, Action<EtcdResponse> followUp, bool recursive = false, int? timeout = null)
+        /// <param name="waitIndex">Index to wait from</param>
+        public void Watch(string key, Action<EtcdResponse> followUp, bool recursive = false, int? timeout = null, int? waitIndex = null)
         {
             var requestUrl = _keysRoot.AppendPath(key);
             var getRequest = new RestRequest(requestUrl, Method.GET);
@@ -167,7 +168,7 @@
 
             if (recursive)
             {
-                getRequest.AddParameter("recursive", recursive);
+                getRequest.AddParameter("recursive", true);
             }
 
             if (timeout.HasValue)
@@ -175,8 +176,12 @@
                 getRequest.Timeout = timeout.Value;
             }
 
-            _client.ExecuteTaskAsync<EtcdResponse>(getRequest)
-                   .ContinueWith(t => followUp(t.Result.Data));
+            if (waitIndex.HasValue)
+            {
+                getRequest.AddParameter("waitIndex", waitIndex);
+            }
+
+            _client.ExecuteAsync<EtcdResponse>(getRequest, r =>followUp(r == null ? null : r.Data));
         }
 
         EtcdResponse makeKeyRequest(string key, Method method, Action<IRestRequest> action = null)

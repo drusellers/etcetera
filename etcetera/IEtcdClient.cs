@@ -72,7 +72,8 @@
         /// <param name="followUp">callback</param>
         /// <param name="recursive">watch subkeys?</param>
         /// <param name="timeout">How long will we watch?</param>
-        void Watch(string key, Action<EtcdResponse> followUp, bool recursive = false, int? timeout = null);
+        /// <param name="waitIndex">Index to wait from</param>
+        void Watch(string key, Action<EtcdResponse> followUp, bool recursive = false, int? timeout = null, int? waitIndex = null);
 
         IEtcdStatisticsModule Statistics { get; }
         IEtcdLockModule Lock { get; }
