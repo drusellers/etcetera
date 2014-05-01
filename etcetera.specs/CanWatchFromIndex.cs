@@ -4,7 +4,7 @@
     using Should;
     using Xunit;
 
-    public class CanWatchKeysRecursively :
+    public class CanWatchFromIndex :
         EtcdBase
     {
         ManualResetEvent _wasHit;
@@ -12,15 +12,14 @@
         [Fact]
         public void ActionIsSet()
         {
+            Client.Set(AKey, "wassup");
+            var response = Client.Get(AKey);
+
             _wasHit = new ManualResetEvent(false);
-            Client.Set("bob/" + AKey, "wassup");
 
-            Client.Watch("bob", resp =>
-            {
-                _wasHit.Set();
-            }, true);
+            //Should return immediately
+            Client.Watch(AKey, resp => _wasHit.Set(), false, null, response.Node.ModifiedIndex);
 
-            Client.Set("bob/" + AKey, "nope");
             _wasHit.WaitOne(1000).ShouldBeTrue();
         }
     }
