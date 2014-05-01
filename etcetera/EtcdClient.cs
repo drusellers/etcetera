@@ -168,7 +168,7 @@
 
             if (recursive)
             {
-                getRequest.AddParameter("recursive", true);
+                getRequest.AddParameter("recursive", "true");
             }
 
             if (timeout.HasValue)
