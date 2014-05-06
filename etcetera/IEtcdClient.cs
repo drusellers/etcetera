@@ -76,6 +76,5 @@
         void Watch(string key, Action<EtcdResponse> followUp, bool recursive = false, int? timeout = null, int? waitIndex = null);
 
         IEtcdStatisticsModule Statistics { get; }
-        IEtcdLockModule Lock { get; }
     }
 }
