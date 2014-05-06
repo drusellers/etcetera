@@ -24,7 +24,6 @@ namespace etcetera.specs
         public void SupportPrevIndex()
         {
             var one = "one";
-            var two = "two";
 
             var rep1 = Client.Set(AKey, one);
             var rep2 = Client.Delete(AKey, prevIndex: rep1.Node.CreatedIndex + 1);
@@ -38,7 +37,6 @@ namespace etcetera.specs
         public void ReturnsCompareAndDeleteData()
         {
             var one = "one";
-            var two = "two";
 
             var rep1 = Client.Set(AKey, one);
             var rep2 = Client.Delete(AKey, prevIndex: rep1.Node.CreatedIndex);

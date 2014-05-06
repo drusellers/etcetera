@@ -8,7 +8,7 @@ namespace etcetera.specs
         [Fact]
         public void SupportsPreviousExist()
         {
-            var rep1 = Client.Set(AKey, "one");
+            Client.Set(AKey, "one");
             var rep2 = Client.Set(AKey, "three", prevExist:false);
 
             rep2.ErrorCode.ShouldEqual(105);
@@ -23,7 +23,7 @@ namespace etcetera.specs
             var one = "one";
             var two = "two";
 
-            var rep1 = Client.Set(AKey, one);
+            Client.Set(AKey, one);
             var rep2 = Client.Set(AKey, "three", prevValue: two);
 
             rep2.ErrorCode.ShouldEqual(101);
@@ -36,7 +36,6 @@ namespace etcetera.specs
         public void SupportsPreviousIndex()
         {
             var one = "one";
-            var two = "two";
 
             var rep1 = Client.Set(AKey, one);
             var rep2 = Client.Set(AKey, "three", prevIndex: rep1.Node.CreatedIndex+1);
@@ -50,10 +49,9 @@ namespace etcetera.specs
         [Fact]
         public void ReturnsCompareAndSwapData()
         {
-
             var one = "one";
 
-            var rep1 = Client.Set(AKey, one);
+            Client.Set(AKey, one);
             var rep2 = Client.Set(AKey, "three", prevValue: one);
 
             rep2.Action.ShouldEqual("compareAndSwap");
