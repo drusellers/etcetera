@@ -1,4 +1,6 @@
-﻿namespace etcetera.specs
+﻿using System.Diagnostics;
+
+namespace etcetera.specs
 {
     using System.Threading;
     using Should;
@@ -14,7 +16,7 @@
         {
             _wasHit = new ManualResetEvent(false);
             Client.Set(AKey, "wassup");
-            
+
             Client.Watch(AKey, resp =>
             {
                 _wasHit.Set();
@@ -30,16 +32,16 @@
             _wasHit = new ManualResetEvent(false);
             Client.Set(AKey, "wassup");
 
+            var watch = new Stopwatch();
+            watch.Start();
             Client.Watch(AKey, resp =>
             {
+                watch.Stop();
                 _wasHit.Set();
             }, timeout: 1);
 
-            Thread.Sleep(1100);
-
-            Client.Set(AKey, "nope");
-
-            _wasHit.WaitOne(200).ShouldBeFalse();
+            _wasHit.WaitOne(200).ShouldBeTrue();
+            watch.ElapsedMilliseconds.ShouldBeLessThan(100);
         }
     }
 }
