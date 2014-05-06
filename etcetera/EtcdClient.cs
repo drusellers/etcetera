@@ -19,7 +19,6 @@
             _client = new RestClient(root.ToString());
 
             Statistics = new StatisticsModule(root, _client);
-            Lock = new EtcdLockModule(root, _client);
         }
 
         /// <summary>
@@ -197,8 +196,5 @@
         }
 
         public IEtcdStatisticsModule Statistics { get; private set; }
-        public IEtcdLockModule Lock { get; private set; }
-
-        //TODO: Leadership module
     }
 }
