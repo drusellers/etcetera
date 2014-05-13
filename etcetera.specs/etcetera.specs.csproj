@@ -59,6 +59,7 @@
     <Compile Include="CanSetDirsWithTtl.cs" />
     <Compile Include="CanSetKeysWithTtl.cs" />
     <Compile Include="CanSetKeys.cs" />
+    <Compile Include="CanUpdateDirsWithTtl.cs" />
     <Compile Include="CanWatchFromIndex.cs" />
     <Compile Include="CanWatchKeys.cs" />
     <Compile Include="CanWatchKeysRecursively.cs" />

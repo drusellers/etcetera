@@ -12,7 +12,7 @@
         /// <param name="key">a hierarchical key</param>
         /// <param name="ttl">time to live in seconds</param>
         /// <param name="value">etcd only supports string values</param>
-        /// <param name="prevExist">Used to compare and swap on existance</param>
+        /// <param name="prevExist">Used to compare and swap on existence</param>
         /// <param name="prevValue">Used to compare and swap on value</param>
         /// <param name="prevIndex">Used to compare and swap on index</param>
         /// <returns></returns>
@@ -25,8 +25,9 @@
         /// </summary>
         /// <param name="key">the directory key</param>
         /// <param name="ttl">time to live in seconds</param>
+        /// <param name="prevExist">Used to compare and swap on existence</param>
         /// <returns></returns>
-        EtcdResponse CreateDir(string key, int ttl = 0);
+        EtcdResponse CreateDir(string key, int ttl = 0, bool? prevExist = null);
 
 
         /// <summary>
