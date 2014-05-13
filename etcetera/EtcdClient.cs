@@ -33,7 +33,7 @@
         /// <param name="prevValue">Used to compare and swap on value</param>
         /// <param name="prevIndex">Used to compare and swap on index</param>
         /// <returns></returns>
-        public EtcdResponse Set(string key, string value, int ttl = 0, bool? prevExist = null, string prevValue = null,
+        public EtcdResponse Set(string key, string value, int ttl = 0, bool prevExist = false, string prevValue = null,
             int? prevIndex = null)
         {
             return makeKeyRequest(key, Method.PUT, req =>
@@ -45,9 +45,9 @@
                 {
                     req.AddParameter("ttl", ttl);
                 }
-                if (prevExist.HasValue)
+                if (prevExist)
                 {
-                    req.AddParameter("prevExist", prevExist.Value.ToString().ToLower());
+                    req.AddParameter("prevExist", "true");
                 }
                 if (prevValue != null)
                 {
@@ -67,7 +67,7 @@
         /// <param name="ttl">time to live in seconds</param>
         /// <param name="prevExist">Used to compare and swap on existence</param>
         /// <returns></returns>
-        public EtcdResponse CreateDir(string key, int ttl = 0, bool? prevExist = null)
+        public EtcdResponse CreateDir(string key, int ttl = 0, bool prevExist = false)
         {
             return makeKeyRequest(key, Method.PUT, req =>
             {
@@ -76,9 +76,9 @@
                 {
                     req.AddParameter("ttl", ttl);
                 }
-                if (prevExist.HasValue)
+                if (prevExist)
                 {
-                    req.AddParameter("prevExist", prevExist.Value.ToString().ToLower());
+                    req.AddParameter("prevExist", "true");
                 }
             });
         }
