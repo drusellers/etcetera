@@ -39,7 +39,7 @@
         [Fact]
         public void IsDir()
         {
-            _response.Node.Dir.ShouldBeFalse();
+            _response.Node.Dir.ShouldBeTrue();
         }
 
         [Fact]
