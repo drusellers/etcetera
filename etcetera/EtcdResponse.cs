@@ -23,7 +23,7 @@
     public class EtcdHeaders
     {
         public int EtcdIndex { get; set; }
-        public int RaftIndex { get; set; }
-        public int RaftTerm { get; set; }
+        public int? RaftIndex { get; set; }
+        public int? RaftTerm { get; set; }
     }
 }

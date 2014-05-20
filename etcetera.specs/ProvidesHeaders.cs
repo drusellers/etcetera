@@ -19,19 +19,21 @@ namespace etcetera.specs
         public void EtcdIndex()
         {
             //TODO: make test more robust
-            _getResponse.Headers.EtcdIndex.ShouldBeGreaterThan(-1);
+            _getResponse.Headers.EtcdIndex.ShouldBeGreaterThan(0);
         }
 
         [Fact]
         public void RaftIndex()
         {
-            _getResponse.Headers.RaftIndex.ShouldBeGreaterThan(-1);
+            _getResponse.Headers.RaftIndex.ShouldBeGreaterThan(0);
         }
 
         [Fact]
         public void KeyIsSet()
         {
-            _getResponse.Headers.RaftTerm.ShouldEqual(0);
+            // From the documentation: "is an integer that will increase whenever an etcd master election happens in the cluster."
+            // Therefore, for any cluster, it should be at least 1.
+            _getResponse.Headers.RaftTerm.ShouldBeGreaterThan(0);
         }
 
     }

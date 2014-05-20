@@ -207,11 +207,16 @@
 
         static void processHeaders(EtcdResponse etcdResponse, IRestResponse<EtcdResponse> response)
         {
-            if (response.Headers.Any(h=>h.Name.Contains("Etcd"))) return;
+            if (etcdResponse == null) return;
 
-            etcdResponse.Headers.EtcdIndex = int.Parse(response.Headers.Single(h => h.Name.Equals("X-Etcd-Index")).Value.ToString());
-            etcdResponse.Headers.RaftIndex = int.Parse(response.Headers.Single(h => h.Name.Equals( "X-Raft-Index")).Value.ToString());
-            etcdResponse.Headers.RaftTerm = int.Parse(response.Headers.Single(h => h.Name.Equals( "X-Raft-Term")).Value.ToString());
+            // While X-Raft-Index and X-Raft-Term have been noticed as missing (e.g., when Compare and Delete fails), X-Etcd-Index should always exist.
+            etcdResponse.Headers.EtcdIndex = int.Parse(response.Headers.First(h => h.Name.Equals("X-Etcd-Index")).Value.ToString());
+
+            var raftIndexHeader = response.Headers.FirstOrDefault(h => h.Name.Equals("X-Raft-Index"));
+            if (raftIndexHeader != null) etcdResponse.Headers.RaftIndex = int.Parse(raftIndexHeader.Value.ToString());
+
+            var raftTermHeader = response.Headers.FirstOrDefault(h => h.Name.Equals("X-Raft-Term"));
+            if (raftTermHeader != null) etcdResponse.Headers.RaftTerm = int.Parse(raftTermHeader.Value.ToString());
         }
 
         public IEtcdStatisticsModule Statistics { get; private set; }
