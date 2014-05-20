@@ -45,7 +45,6 @@
     <Compile Include="EtcdResponse.cs" />
     <Compile Include="Statistics\EtcdSelfStatistics.cs" />
     <Compile Include="Statistics\EtcdStoreResponse.cs" />
-    <Compile Include="EtcResponseHelpers.cs" />
     <Compile Include="IEtcdClient.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
