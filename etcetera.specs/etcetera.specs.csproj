@@ -66,6 +66,7 @@
     <Compile Include="EtcdBase.cs" />
     <Compile Include="KeysWithSlashes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProvidesHeaders.cs" />
     <Compile Include="TrimUserSuppliedPath.cs" />
   </ItemGroup>
   <ItemGroup>

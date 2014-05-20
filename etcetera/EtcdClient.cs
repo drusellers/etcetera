@@ -1,6 +1,7 @@
 ﻿namespace etcetera
 {
     using System;
+    using System.Linq;
     using RestSharp;
 
     public class EtcdClient : IEtcdClient
@@ -197,7 +198,18 @@
             if (action != null) action(request);
 
             var response = _client.Execute<EtcdResponse>(request);
-            return response.Data;
+            var etcdResponse = response.Data;
+            
+            processHeaders(etcdResponse, response);
+
+            return etcdResponse;
+        }
+
+        static void processHeaders(EtcdResponse etcdResponse, IRestResponse<EtcdResponse> response)
+        {
+            etcdResponse.Headers.EtcdIndex = int.Parse(response.Headers.Single(h => h.Name.Equals("X-Etcd-Index")).Value.ToString());
+            etcdResponse.Headers.RaftIndex = int.Parse(response.Headers.Single(h => h.Name.Equals( "X-Raft-Index")).Value.ToString());
+            etcdResponse.Headers.RaftTerm = int.Parse(response.Headers.Single(h => h.Name.Equals( "X-Raft-Term")).Value.ToString());
         }
 
         public IEtcdStatisticsModule Statistics { get; private set; }
