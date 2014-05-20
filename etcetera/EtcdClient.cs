@@ -39,8 +39,6 @@
         {
             return makeKeyRequest(key, Method.PUT, req =>
             {
-                //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
-                req.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
                 req.AddParameter("value", value);
                 if (ttl > 0)
                 {
@@ -96,9 +94,6 @@
         {
             return makeKeyRequest(key, Method.GET, req =>
             {
-                //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
-                req.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
-
                 req.AddParameter("recursive", recursive.ToString().ToLower());
                 req.AddParameter("sorted", sorted.ToString().ToLower());
                 req.AddParameter("consistent", sorted.ToString().ToLower());
@@ -128,9 +123,6 @@
         {
             return makeKeyRequest(key, Method.DELETE, req =>
             {
-                //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
-                req.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
-
                 if (prevValue != null)
                 {
                     req.AddParameter("prevValue", prevValue);
@@ -194,6 +186,8 @@
             var requestUrl = _keysRoot.AppendPath(key);
             var request = new RestRequest(requestUrl, method);
 
+            //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
+            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
 
             if (action != null) action(request);
 

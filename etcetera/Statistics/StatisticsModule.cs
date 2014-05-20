@@ -23,37 +23,28 @@
 
         public EtcdStoreResponse Store()
         {
-            var requestUrl = _root.AppendPath("v2").AppendPath("stats").AppendPath("store");
-            var request = new RestRequest(requestUrl, Method.GET);
-
-            //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
-
-            var response = _client.Execute<EtcdStoreResponse>(request);
-            return response.Data;
+            return makeStatsRequest<EtcdStoreResponse>("store", Method.GET);
         }
 
         public EtcdLeaderStatsResponse Leader()
         {
-            var requestUrl = _root.AppendPath("v2").AppendPath("stats").AppendPath("leader");
-            var request = new RestRequest(requestUrl, Method.GET);
-
-            //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
-
-            var response = _client.Execute<EtcdLeaderStatsResponse>(request);
-            return response.Data;
+            return makeStatsRequest<EtcdLeaderStatsResponse>("leader", Method.GET);
         }
 
         public EtcdSelfStatistics Self()
         {
-            var requestUrl = _root.AppendPath("v2").AppendPath("stats").AppendPath("self");
-            var request = new RestRequest(requestUrl, Method.GET);
+            return makeStatsRequest<EtcdSelfStatistics>("self", Method.GET);
+        }
+
+        TResponse makeStatsRequest<TResponse>(string key, Method verb) where TResponse:new()
+        {
+            var requestUrl = _root.AppendPath("v2").AppendPath("stats").AppendPath(key);
+            var request = new RestRequest(requestUrl, verb);
 
             //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
 
-            var response = _client.Execute<EtcdSelfStatistics>(request);
+            var response = _client.Execute<TResponse>(request);
             return response.Data;
         }
     }
