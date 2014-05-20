@@ -11,7 +11,7 @@
 
         protected EtcdBase()
         {
-            Client = new EtcdClient(new Uri("http://127.0.0.1:4001/"));
+            Client = new EtcdClient(new Uri("http://192.168.101.1:4001/"));
         }
     }
 }

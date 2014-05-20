@@ -1,9 +1,8 @@
-﻿using System.Runtime.Remoting.Messaging;
-using Should;
-using Xunit;
-
-namespace etcetera.specs
+﻿namespace etcetera.specs
 {
+    using Should;
+    using Xunit;
+
     public class CanCompareAndDelete : EtcdBase
     {
         [Fact]
@@ -11,13 +10,13 @@ namespace etcetera.specs
         {
             var one = "one";
             var two = "two";
-            
+
             var rep1 = Client.Set(AKey, one);
-            var rep2 = Client.Delete(AKey, prevValue:two);
+            var rep2 = Client.Delete(AKey, two);
 
             rep2.ErrorCode.ShouldEqual(101);
             rep2.Message.ShouldEqual("Compare failed");
-            rep2.Cause.ShouldEqual(string.Format("[{0} != {1}] [0 != {2}]", two, one, rep1.Node.CreatedIndex));
+            rep2.Cause.ShouldEqual(string.Format("[{0} != {1}]", two, one));
         }
 
         [Fact]
@@ -30,7 +29,8 @@ namespace etcetera.specs
 
             rep2.ErrorCode.ShouldEqual(101);
             rep2.Message.ShouldEqual("Compare failed");
-            rep2.Cause.ShouldEqual(string.Format("[ != {0}] [{1} != {2}]", one, rep1.Node.CreatedIndex + 1, rep1.Node.CreatedIndex));
+            rep2.Cause.ShouldEqual(string.Format("[{0} != {1}]", rep1.Node.CreatedIndex + 1,
+                rep1.Node.CreatedIndex));
         }
 
         [Fact]
