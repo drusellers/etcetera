@@ -9,7 +9,7 @@ namespace etcetera.specs
         public void SupportsPreviousExist()
         {
             Client.Set(AKey, "one");
-            var rep2 = Client.Set(AKey, "three", prevExist:false);
+            var rep2 = Client.Set(AKey, "three", prevExist:true);
 
 
             rep2.ErrorCode.ShouldEqual(105);

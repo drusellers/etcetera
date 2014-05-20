@@ -207,6 +207,8 @@
 
         static void processHeaders(EtcdResponse etcdResponse, IRestResponse<EtcdResponse> response)
         {
+            if (response.Headers.Any(h=>h.Name.Contains("Etcd"))) return;
+
             etcdResponse.Headers.EtcdIndex = int.Parse(response.Headers.Single(h => h.Name.Equals("X-Etcd-Index")).Value.ToString());
             etcdResponse.Headers.RaftIndex = int.Parse(response.Headers.Single(h => h.Name.Equals( "X-Raft-Index")).Value.ToString());
             etcdResponse.Headers.RaftTerm = int.Parse(response.Headers.Single(h => h.Name.Equals( "X-Raft-Term")).Value.ToString());
