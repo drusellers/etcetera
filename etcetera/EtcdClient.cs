@@ -187,15 +187,16 @@
             var requestUrl = _keysRoot.AppendPath(key);
             var request = new RestRequest(requestUrl, method);
 
-            //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
 
             if (action != null) action(request);
 
             var response = _client.Execute<EtcdResponse>(request);
 
             if(checkForError(response)) throw constructException(response);
-            
+
+            //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
+            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+
             var etcdResponse = response.Data;
             
             processHeaders(etcdResponse, response);
@@ -230,9 +231,9 @@
             var msg = new StringBuilder();
             msg.AppendFormat("Server: '{0}'", _client.BaseUrl);
             msg.AppendFormat("- Path: '{0}'", response.Request.Resource);
-            msg.AppendFormat("- Status: '{0} {1}'", response.StatusCode, response.StatusDescription);
+            msg.AppendFormat("- Message: '{0}'", response.ErrorMessage);
 
-            return new EtceteraException(msg.ToString());
+            return new EtceteraException(msg.ToString(), response.ErrorException);
         }
 
         public IEtcdStatisticsModule Statistics { get; private set; }
