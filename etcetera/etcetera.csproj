@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EtcdClient.cs" />
+    <Compile Include="EtceteraException.cs" />
     <Compile Include="Statistics\EtcdLeaderStatsResponse.cs" />
     <Compile Include="EtcdResponse.cs" />
     <Compile Include="Statistics\EtcdSelfStatistics.cs" />

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Text;
     using RestSharp;
 
     public class EtcdClient : IEtcdClient
@@ -192,12 +193,17 @@
             if (action != null) action(request);
 
             var response = _client.Execute<EtcdResponse>(request);
+
+            if(checkForError(response)) throw constructException(response);
+            
             var etcdResponse = response.Data;
             
             processHeaders(etcdResponse, response);
 
             return etcdResponse;
         }
+
+
 
         static void processHeaders(EtcdResponse etcdResponse, IRestResponse<EtcdResponse> response)
         {
@@ -211,6 +217,22 @@
 
             var raftTermHeader = response.Headers.FirstOrDefault(h => h.Name.Equals("X-Raft-Term"));
             if (raftTermHeader != null) etcdResponse.Headers.RaftTerm = int.Parse(raftTermHeader.Value.ToString());
+        }
+
+
+        static bool checkForError(IRestResponse<EtcdResponse> response)
+        {
+            return response.StatusCode == 0;
+        }
+
+         Exception constructException(IRestResponse<EtcdResponse> response)
+        {
+            var msg = new StringBuilder();
+            msg.AppendFormat("Server: '{0}'", _client.BaseUrl);
+            msg.AppendFormat("- Path: '{0}'", response.Request.Resource);
+            msg.AppendFormat("- Status: '{0} {1}'", response.StatusCode, response.StatusDescription);
+
+            return new EtceteraException(msg.ToString());
         }
 
         public IEtcdStatisticsModule Statistics { get; private set; }
