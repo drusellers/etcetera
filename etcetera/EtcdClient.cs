@@ -35,7 +35,7 @@
         /// <param name="prevValue">Used to compare and swap on value</param>
         /// <param name="prevIndex">Used to compare and swap on index</param>
         /// <returns></returns>
-        public EtcdResponse Set(string key, string value, int ttl = 0, bool prevExist = false, string prevValue = null,
+        public EtcdResponse Set(string key, string value, int ttl = 0, bool? prevExist = null, string prevValue = null,
             int? prevIndex = null)
         {
             return makeKeyRequest(key, Method.PUT, req =>
@@ -45,14 +45,18 @@
                 {
                     req.AddParameter("ttl", ttl);
                 }
-                if (prevExist)
+
+                if (prevExist.HasValue)
                 {
-                    req.AddParameter("prevExist", "true");
+                    var val = prevExist.Value ? "true" : "false";
+                    req.AddParameter("prevExist", val);
                 }
+
                 if (prevValue != null)
                 {
                     req.AddParameter("prevValue", prevValue);
                 }
+
                 if (prevIndex.HasValue)
                 {
                     req.AddParameter("prevIndex", prevIndex.Value);

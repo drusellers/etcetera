@@ -16,7 +16,7 @@
         /// <param name="prevValue">Used to compare and swap on value</param>
         /// <param name="prevIndex">Used to compare and swap on index</param>
         /// <returns></returns>
-        EtcdResponse Set(string key, string value, int ttl = 0, bool prevExist = false, string prevValue = null,
+        EtcdResponse Set(string key, string value, int ttl = 0, bool? prevExist = null, string prevValue = null,
             int? prevIndex = null);
 
 
