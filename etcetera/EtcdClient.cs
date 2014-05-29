@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Text;
     using RestSharp;
 
     public class EtcdClient : IEtcdClient
@@ -34,7 +35,7 @@
         /// <param name="prevValue">Used to compare and swap on value</param>
         /// <param name="prevIndex">Used to compare and swap on index</param>
         /// <returns></returns>
-        public EtcdResponse Set(string key, string value, int ttl = 0, bool prevExist = false, string prevValue = null,
+        public EtcdResponse Set(string key, string value, int ttl = 0, bool? prevExist = null, string prevValue = null,
             int? prevIndex = null)
         {
             return makeKeyRequest(key, Method.PUT, req =>
@@ -44,14 +45,18 @@
                 {
                     req.AddParameter("ttl", ttl);
                 }
-                if (prevExist)
+
+                if (prevExist.HasValue)
                 {
-                    req.AddParameter("prevExist", "true");
+                    var val = prevExist.Value ? "true" : "false";
+                    req.AddParameter("prevExist", val);
                 }
+
                 if (prevValue != null)
                 {
                     req.AddParameter("prevValue", prevValue);
                 }
+
                 if (prevIndex.HasValue)
                 {
                     req.AddParameter("prevIndex", prevIndex.Value);
@@ -186,13 +191,25 @@
             var requestUrl = _keysRoot.AppendPath(key);
             var request = new RestRequest(requestUrl, method);
 
-            //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
 
             if (action != null) action(request);
 
-            return processRestResponse(_client.Execute<EtcdResponse>(request));
+
+            //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
+            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+
+            var response = _client.Execute<EtcdResponse>(request);
+
+
+
+            if(checkForError(response)) throw constructException(response);
+
+            
+            var etcdResponse = processRestResponse(response);
+            
+            return etcdResponse;
         }
+
 
         static EtcdResponse processRestResponse(IRestResponse<EtcdResponse> response)
         {
@@ -212,6 +229,22 @@
             }
 
             return etcdResponse;
+        }
+
+
+        static bool checkForError(IRestResponse<EtcdResponse> response)
+        {
+            return response.StatusCode == 0;
+        }
+
+         Exception constructException(IRestResponse<EtcdResponse> response)
+        {
+            var msg = new StringBuilder();
+            msg.AppendFormat("Server: '{0}'", _client.BaseUrl);
+            msg.AppendFormat("- Path: '{0}'", response.Request.Resource);
+            msg.AppendFormat("- Message: '{0}'", response.ErrorMessage);
+
+            return new EtceteraException(msg.ToString(), response.ErrorException);
         }
 
         public IEtcdStatisticsModule Statistics { get; private set; }
