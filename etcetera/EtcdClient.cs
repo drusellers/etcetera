@@ -191,7 +191,6 @@
             var requestUrl = _keysRoot.AppendPath(key);
             var request = new RestRequest(requestUrl, method);
 
-
             if (action != null) action(request);
 
 
@@ -200,10 +199,7 @@
 
             var response = _client.Execute<EtcdResponse>(request);
 
-
-
             if(checkForError(response)) throw constructException(response);
-
             
             var etcdResponse = processRestResponse(response);
             
