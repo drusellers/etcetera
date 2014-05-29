@@ -179,7 +179,7 @@
                 getRequest.AddParameter("waitIndex", waitIndex);
             }
 
-            _client.ExecuteAsync<EtcdResponse>(getRequest, r =>followUp(r == null ? null : r.Data));
+            _client.ExecuteAsync<EtcdResponse>(getRequest, r => followUp(processRestResponse(r)));
         }
 
         EtcdResponse makeKeyRequest(string key, Method method, Action<IRestRequest> action = null)
@@ -190,34 +190,41 @@
 
             if (action != null) action(request);
 
-            var response = _client.Execute<EtcdResponse>(request);
-
-            if(checkForError(response)) throw constructException(response);
 
             //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
 
-            var etcdResponse = response.Data;
-            
-            processHeaders(etcdResponse, response);
+            var response = _client.Execute<EtcdResponse>(request);
 
+
+
+            if(checkForError(response)) throw constructException(response);
+
+            
+            var etcdResponse = processRestResponse(response);
+            
             return etcdResponse;
         }
 
 
-
-        static void processHeaders(EtcdResponse etcdResponse, IRestResponse<EtcdResponse> response)
+        static EtcdResponse processRestResponse(IRestResponse<EtcdResponse> response)
         {
-            if (etcdResponse == null) return;
+            if (response == null) return null;
 
-            // While X-Raft-Index and X-Raft-Term have been noticed as missing (e.g., when Compare and Delete fails), X-Etcd-Index should always exist.
-            etcdResponse.Headers.EtcdIndex = int.Parse(response.Headers.First(h => h.Name.Equals("X-Etcd-Index")).Value.ToString());
+            var etcdResponse = response.Data;
+            if (etcdResponse != null)
+            {
+                // While X-Raft-Index and X-Raft-Term have been noticed as missing (e.g., when Compare and Delete fails), X-Etcd-Index should always exist.
+                etcdResponse.Headers.EtcdIndex = int.Parse(response.Headers.First(h => h.Name.Equals("X-Etcd-Index")).Value.ToString());
 
-            var raftIndexHeader = response.Headers.FirstOrDefault(h => h.Name.Equals("X-Raft-Index"));
-            if (raftIndexHeader != null) etcdResponse.Headers.RaftIndex = int.Parse(raftIndexHeader.Value.ToString());
+                var raftIndexHeader = response.Headers.FirstOrDefault(h => h.Name.Equals("X-Raft-Index"));
+                if (raftIndexHeader != null) etcdResponse.Headers.RaftIndex = int.Parse(raftIndexHeader.Value.ToString());
 
-            var raftTermHeader = response.Headers.FirstOrDefault(h => h.Name.Equals("X-Raft-Term"));
-            if (raftTermHeader != null) etcdResponse.Headers.RaftTerm = int.Parse(raftTermHeader.Value.ToString());
+                var raftTermHeader = response.Headers.FirstOrDefault(h => h.Name.Equals("X-Raft-Term"));
+                if (raftTermHeader != null) etcdResponse.Headers.RaftTerm = int.Parse(raftTermHeader.Value.ToString());
+            }
+
+            return etcdResponse;
         }
 
 
