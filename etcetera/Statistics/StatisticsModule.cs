@@ -1,4 +1,6 @@
-﻿namespace etcetera
+﻿using System.Text;
+
+namespace etcetera
 {
     using System;
     using RestSharp;
@@ -45,7 +47,25 @@
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
 
             var response = _client.Execute<TResponse>(request);
+
+            if (checkForError(response)) throw constructException(response);
+
             return response.Data;
+        }
+
+        static bool checkForError<TResponse>(IRestResponse<TResponse> response)
+        {
+            return response.StatusCode == 0;
+        }
+
+        Exception constructException<TResponse>(IRestResponse<TResponse> response)
+        {
+            var msg = new StringBuilder();
+            msg.AppendFormat("Server: '{0}'", _client.BaseUrl);
+            msg.AppendFormat("- Path: '{0}'", response.Request.Resource);
+            msg.AppendFormat("- Message: '{0}'", response.ErrorMessage);
+
+            return new EtceteraException(msg.ToString(), response.ErrorException);
         }
     }
 }
