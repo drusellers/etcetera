@@ -56,6 +56,7 @@
     <Compile Include="CanHandleExpiredKeys.cs" />
     <Compile Include="CanQueueKeys.cs" />
     <Compile Include="CanReadQueueKeys.cs" />
+    <Compile Include="CanSetClientCertificates.cs" />
     <Compile Include="CanSetDirsWithTtl.cs" />
     <Compile Include="CanSetKeysWithTtl.cs" />
     <Compile Include="CanSetKeys.cs" />

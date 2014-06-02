@@ -4,6 +4,7 @@
     using System.Linq;
     using System.Text;
     using RestSharp;
+    using System.Security.Cryptography.X509Certificates;
 
     public class EtcdClient : IEtcdClient
     {
@@ -244,5 +245,17 @@
         }
 
         public IEtcdStatisticsModule Statistics { get; private set; }
+
+        public X509CertificateCollection ClientCertificates
+        {
+            get
+            {
+                return _client.ClientCertificates;
+            }
+            set
+            {
+                _client.ClientCertificates = value;
+            }
+        }
     }
 }
