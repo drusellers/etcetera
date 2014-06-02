@@ -1,6 +1,7 @@
 ﻿namespace etcetera
 {
     using System;
+    using System.Security.Cryptography.X509Certificates;
 
     public interface IEtcdClient
     {
@@ -77,5 +78,7 @@
         void Watch(string key, Action<EtcdResponse> followUp, bool recursive = false, int? timeout = null, int? waitIndex = null);
 
         IEtcdStatisticsModule Statistics { get; }
+
+        X509CertificateCollection ClientCertificates { get; set; }
     }
 }
