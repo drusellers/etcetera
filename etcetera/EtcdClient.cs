@@ -176,7 +176,7 @@
 
             if (timeout.HasValue)
             {
-                getRequest.Timeout = timeout.Value;
+                getRequest.Timeout = timeout.Value * 1000;
             }
 
             if (waitIndex.HasValue)
@@ -234,7 +234,7 @@
             return response.StatusCode == 0;
         }
 
-         Exception constructException(IRestResponse<EtcdResponse> response)
+        Exception constructException(IRestResponse<EtcdResponse> response)
         {
             var msg = new StringBuilder();
             msg.AppendFormat("Server: '{0}'", _client.BaseUrl);
