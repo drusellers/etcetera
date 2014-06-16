@@ -22,6 +22,7 @@
             _client = new RestClient(root.ToString());
 
             Statistics = new StatisticsModule(root, _client);
+            Machine = new MachineModule(root, _client);
         }
 
         /// <summary>
@@ -245,6 +246,8 @@
         }
 
         public IEtcdStatisticsModule Statistics { get; private set; }
+
+        public IEtcdMachineModule Machine { get; private set; }
 
         public X509CertificateCollection ClientCertificates
         {
