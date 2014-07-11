@@ -79,6 +79,8 @@
 
         IEtcdStatisticsModule Statistics { get; }
 
+        IEtcdMachineModule Machine { get; }
+
         X509CertificateCollection ClientCertificates { get; set; }
     }
 }
