@@ -40,8 +40,8 @@ namespace etcetera.specs
                 _wasHit.Set();
             }, timeout: 1);
 
-            _wasHit.WaitOne(200).ShouldBeTrue();
-            watch.ElapsedMilliseconds.ShouldBeLessThan(100);
+            _wasHit.WaitOne(2000).ShouldBeTrue();
+            watch.ElapsedMilliseconds.ShouldBeLessThan(2000);
         }
     }
 }
