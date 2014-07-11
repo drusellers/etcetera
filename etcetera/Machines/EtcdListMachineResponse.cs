@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
 
-    public class EtcdListMachineResponse : List<Machine>
+    public class EtcdListMachineResponse : List<EtcdMachineResponse>
     {
         
     }

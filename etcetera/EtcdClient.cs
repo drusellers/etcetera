@@ -22,7 +22,7 @@
             _client = new RestClient(root.ToString());
 
             Statistics = new StatisticsModule(root, _client);
-            Machine = new MachineModule(root, _client);
+            Machine = new MachineModule(root);
         }
 
         /// <summary>

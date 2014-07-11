@@ -14,10 +14,11 @@
         readonly Uri _root;
         readonly IRestClient _client;
 
-        public MachineModule(Uri root, IRestClient restClient)
+        public MachineModule(Uri root)
         {
-            _root = root;
-            _client = restClient;
+            _root = new UriBuilder(root.Scheme, root.Host, 7001, root.LocalPath).Uri;
+
+            _client = new RestClient(_root.ToString());
         }
 
         public EtcdMachineResponse Get(string machineName)
@@ -36,6 +37,8 @@
             if (!string.IsNullOrEmpty(key)) requestUrl = requestUrl.AppendPath(key); 
 
             var request = new RestRequest(requestUrl, Method.GET);
+            request.AddHeader("Accept", "*/*");
+            request.AddHeader("Accept-Encoding", "");
 
             //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };

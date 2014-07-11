@@ -42,10 +42,9 @@
   <ItemGroup>
     <Compile Include="EtcdClient.cs" />
     <Compile Include="EtceteraException.cs" />
-    <Compile Include="Machines\EtcdMachineResponse.cs" />
     <Compile Include="Machines\EtcdListMachineResponse.cs" />
     <Compile Include="Machines\MachineModule.cs" />
-    <Compile Include="Machines\Machine.cs" />
+    <Compile Include="Machines\EtcdMachineResponse.cs" />
     <Compile Include="Statistics\EtcdLeaderStatsResponse.cs" />
     <Compile Include="EtcdResponse.cs" />
     <Compile Include="Statistics\EtcdSelfStatistics.cs" />
