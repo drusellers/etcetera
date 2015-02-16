@@ -2,7 +2,7 @@
 {
     using System;
     using System.Security.Cryptography.X509Certificates;
-
+    
     public interface IEtcdClient
     {
         /// <summary>
@@ -80,6 +80,8 @@
         IEtcdStatisticsModule Statistics { get; }
 
         IEtcdMachineModule Machine { get; }
+
+        IEtcdMembersModule Members { get; }
 
         X509CertificateCollection ClientCertificates { get; set; }
     }

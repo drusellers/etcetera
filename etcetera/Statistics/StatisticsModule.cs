@@ -43,9 +43,6 @@ namespace etcetera
             var requestUrl = _root.AppendPath("v2").AppendPath("stats").AppendPath(key);
             var request = new RestRequest(requestUrl, verb);
 
-            //needed due to issue 469 - https://github.com/coreos/etcd/issues/469
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
-
             var response = _client.Execute<TResponse>(request);
 
             if (checkForError(response)) throw constructException(response);

@@ -45,6 +45,13 @@
     <Compile Include="Machines\EtcdListMachineResponse.cs" />
     <Compile Include="Machines\MachineModule.cs" />
     <Compile Include="Machines\EtcdMachineResponse.cs" />
+    <Compile Include="Members\EtcdAddMemberRequest.cs" />
+    <Compile Include="Members\EtcdAddMemberResponse.cs" />
+    <Compile Include="Members\EtcdChangePeersResponse.cs" />
+    <Compile Include="Members\EtcdDeleteMemberResponse.cs" />
+    <Compile Include="Members\EtcdListMemberResponse.cs" />
+    <Compile Include="Members\EtcdMember.cs" />
+    <Compile Include="Members\IEtcdMembersModule.cs" />
     <Compile Include="Statistics\EtcdLeaderStatsResponse.cs" />
     <Compile Include="EtcdResponse.cs" />
     <Compile Include="Statistics\EtcdSelfStatistics.cs" />

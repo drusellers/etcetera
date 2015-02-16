@@ -55,6 +55,7 @@
     <Compile Include="CanGetStoreStats.cs" />
     <Compile Include="CanHandleExpiredKeys.cs" />
     <Compile Include="CanListMachines.cs" />
+    <Compile Include="CanListMembers.cs" />
     <Compile Include="CanQueueKeys.cs" />
     <Compile Include="CanReadQueueKeys.cs" />
     <Compile Include="CanSetClientCertificates.cs" />
