@@ -104,7 +104,7 @@
             {
                 req.AddParameter("recursive", recursive.ToString().ToLower());
                 req.AddParameter("sorted", sorted.ToString().ToLower());
-                req.AddParameter("consistent", sorted.ToString().ToLower());
+                req.AddParameter("consistent", consistent.ToString().ToLower());
             });
         }
 
