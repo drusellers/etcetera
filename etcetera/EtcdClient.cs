@@ -263,5 +263,10 @@
                 _client.ClientCertificates = value;
             }
         }
+
+        public void SetBasicAuthentication(string username, string password)
+        {
+            _client.Authenticator = new HttpBasicAuthenticator(username, password);
+        }
     }
 }
