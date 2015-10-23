@@ -84,5 +84,11 @@
         IEtcdMembersModule Members { get; }
 
         X509CertificateCollection ClientCertificates { get; set; }
+
+        /// <summary>
+        /// Allows you to set the underlying authentication mechanism to 
+        /// http basic auth.
+        /// </summary>
+        void SetBasicAuthentication(string username, string password);
     }
 }
